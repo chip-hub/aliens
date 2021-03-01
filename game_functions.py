@@ -13,9 +13,8 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
         # Переместить кораблю влево.
         ship.moving_left = True
     elif event.key == pygame.K_SPACE:
-        # Создание нового снаряда и включение его в группу bullets.
-        new_bullet = Bullet(ai_settings, screen, ship)
-        bullets.add(new_bullet)
+        fire_bullet(ai_settings, screen, ship, bullets)
+        
 
 def check_keyup_events(event, ship):
     """Реагирует на отпускание клавиш."""
@@ -36,13 +35,31 @@ def check_events(ai_settings, screen, ship, bullets):
         elif event.type == pygame.KEYUP:
             check_keyup_events(event, ship)
 
+def fire_bullet(ai_settings, screen, ship, bullets):
+    """Выпускает снаряд, если еще не достигнут максимум"""
+    # Создание нового снаряда и включение его в группу bullets.
+    if len(bullets) < ai_settings.bullets_allowed:
+        new_bullet = Bullet(ai_settings, screen, ship)
+        bullets.add(new_bullet)
+
+def update_bullets(bullets):
+    """Обновляет позиции снарядов и уничтожает старые."""
+    # Выводятся все снаряды
+    for bullet in bullets.sprites():
+        bullet.draw_bullet()
+    bullets.update()
+    # Удаление пуль, вышедших за край экрана
+    for bullet in bullets.copy():
+        if bullet.rect.bottom <= 0:
+            bullets.remove(bullet)
+
 def update_screen(ai_settings, screen, ship, bullets):
     """Обновляет изображение на экране и отображает новый экран."""
     # Перерисовывается экран.
     screen.fill(ai_settings.bg_color)
-    # Выводятся все снаряды
-    for bullet in bullets.sprites():
-        bullet.draw_bullet()
+    # Обновление снарядов
+    update_bullets(bullets)
+    # Перерисовка корабля
     ship.update()
     ship.blitme()
     
