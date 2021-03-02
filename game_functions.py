@@ -3,6 +3,7 @@ import sys
 import pygame
 
 from bullet import Bullet
+from alien import Alien
 
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
     """Реагирует на нажатие клавиш."""
@@ -14,6 +15,8 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
         ship.moving_left = True
     elif event.key == pygame.K_SPACE:
         fire_bullet(ai_settings, screen, ship, bullets)
+    elif event.key == pygame.K_q:
+        sys.exit()
         
 
 def check_keyup_events(event, ship):
@@ -53,7 +56,7 @@ def update_bullets(bullets):
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
 
-def update_screen(ai_settings, screen, ship, bullets):
+def update_screen(ai_settings, screen, ship, aliens, bullets):
     """Обновляет изображение на экране и отображает новый экран."""
     # Перерисовывается экран.
     screen.fill(ai_settings.bg_color)
@@ -62,6 +65,22 @@ def update_screen(ai_settings, screen, ship, bullets):
     # Перерисовка корабля
     ship.update()
     ship.blitme()
+    # Перерисовка пришельца
+    aliens.draw(screen)
     
     # Отображение последнего прорисованного экрана.
     pygame.display.flip()
+
+def creat_fleet(ai_settings, screen, aliens):
+    """Создает флот пришельцев."""
+    # Создание пришельца и вычисление количества пришельцев в ряду.
+    # Интервал между соседними пришельцами равен ширине одного пришельца.
+    alien = Alien(ai_settings, screen)
+    available_space_x = ai_settings.screen_whidth - 2 * alien.rect.width
+    number_aliens_x = int(available_space_x / (2 * alien.rect.width))
+    # Создание первого ряда пришельцев.
+    for alien_number in range(number_aliens_x):
+        alien = Alien(ai_settings, screen)
+        alien.x = alien.rect.width + 2 * alien.rect.width * alien_number
+        alien.rect.x = alien.x
+        aliens.add(alien)

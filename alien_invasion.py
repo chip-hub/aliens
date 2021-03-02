@@ -15,12 +15,16 @@ def run_game():
     ship = Ship(ai_settings, screen)
     # Создание группы для хранения снарядов
     bullets = Group()
+    # Создание пришельцев.
+    aliens = Group()
+    gf.creat_fleet(ai_settings, screen, aliens)
+
         
     # Запуск основного цикла игры.
     while True:
         # Отслеживание событий клавиатуры и мыши.
         gf.check_events(ai_settings, screen, ship, bullets)
         
-        gf.update_screen(ai_settings, screen, ship, bullets)
+        gf.update_screen(ai_settings, screen, ship, aliens, bullets)
 
 run_game()
