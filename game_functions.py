@@ -61,6 +61,11 @@ def update_bullets(bullets):
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
 
+# ----------------- Обновление флота пришельцев --------------------
+def update_aliens(aliens):
+    """Обновляет позиции всех пришельцев"""
+    aliens.update()
+
 # ----------------- Обновление экрана!!! ----------------------------
 
 def get_stars(ai_settings):
@@ -89,6 +94,8 @@ def update_screen(ai_settings, screen, ship, aliens, bullets, stars):
     draw_stars(screen, stars)
     # Обновление снарядов
     update_bullets(bullets)
+    # Обновление флота пришельцев
+    update_aliens(aliens)
     # Перерисовка корабля
     ship.update()
     ship.blitme()
