@@ -50,7 +50,7 @@ def fire_bullet(ai_settings, screen, ship, bullets):
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets.add(new_bullet)
 
-def update_bullets(bullets):
+def update_bullets(ai_settings, screen, ship, aliens, bullets):
     """Обновляет позиции снарядов и уничтожает старые."""
     # Выводятся все снаряды
     for bullet in bullets.sprites():
@@ -60,6 +60,12 @@ def update_bullets(bullets):
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+
+    if len(aliens) == 0:
+        # Уничтожение снарядов и создание нового флота
+        bullets.empty()
+        creat_fleet(ai_settings, screen, ship, aliens)
 
 # ----------------- Обновление флота пришельцев --------------------
 def change_fleet_direction(ai_settings, aliens):
@@ -103,7 +109,7 @@ def update_screen(ai_settings, screen, ship, aliens, bullets, stars):
 
     draw_stars(screen, stars)
     # Обновление снарядов
-    update_bullets(bullets)
+    update_bullets(ai_settings, screen, ship, aliens, bullets)
     # Обновление флота пришельцев
     update_aliens(ai_settings, aliens)
     # Перерисовка корабля
