@@ -1,4 +1,5 @@
 import sys
+from time import sleep
 from random import randint
 
 import pygame
@@ -21,7 +22,6 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
     elif event.key == pygame.K_q:
         sys.exit()
         
-
 def check_keyup_events(event, ship):
     """Реагирует на отпускание клавиш."""
     if event.key == pygame.K_RIGHT:
@@ -50,6 +50,15 @@ def fire_bullet(ai_settings, screen, ship, bullets):
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets.add(new_bullet)
 
+def check_bullet_allien_collision(ai_settings, screen, ship, aliens, bullets):
+    """Обработка коллизий снарядов с пришельцами."""
+    # Удаление снарядов и пришельцев при попадании
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+    if len(aliens) == 0:
+        # Уничтожение снарядов и создание нового флота
+        bullets.empty()
+        creat_fleet(ai_settings, screen, ship, aliens)
+
 def update_bullets(ai_settings, screen, ship, aliens, bullets):
     """Обновляет позиции снарядов и уничтожает старые."""
     # Выводятся все снаряды
@@ -60,20 +69,43 @@ def update_bullets(ai_settings, screen, ship, aliens, bullets):
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
-    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
-
-    if len(aliens) == 0:
-        # Уничтожение снарядов и создание нового флота
-        bullets.empty()
-        creat_fleet(ai_settings, screen, ship, aliens)
-
+    check_bullet_allien_collision(ai_settings, screen, ship, aliens, bullets)
+    
 # ----------------- Обновление флота пришельцев --------------------
+def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+    """Обрабатывает столкновение корабля с пришельцами."""
+    if stats.ships_left > 0:
+        # Уменьшение ships_left
+        stats.ships_left -= 1
+
+        # Очистка списка пришельцев и пуль.
+        aliens.empty()
+        bullets.empty()
+
+        # Создание нового флота и размещение корабля в центре.
+        creat_fleet(ai_settings, screen, ship, aliens)
+        ship.center_ship()
+
+        # Пауза.
+        sleep(0.5)
+    else:
+        stats.game_active = False
+        
+def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
+    """Проверяет добрались ли пришельцы до нижнего края экрана."""
+    screen_rect = screen.get_rect()
+    for alien in aliens.sprites():
+        if alien.rect.bottom >= screen_rect.bottom:
+            # Проводятся действия те же, что и при столкновении корабря с пришельцами - обновление
+            ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+            break
+
 def change_fleet_direction(ai_settings, aliens):
     for alien in aliens.sprites():
         alien.rect.y += ai_settings.fleet_drop_speed
     ai_settings.fleet_direction *= -1
 
-def update_aliens(ai_settings, aliens):
+def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
     """Обновляет позиции всех пришельцев"""
     for alien in aliens:
         if alien.check_edges():
@@ -81,6 +113,10 @@ def update_aliens(ai_settings, aliens):
             break
 
     aliens.update()
+    # Проверка коллизий пришельцы-корабль
+    if pygame.sprite.spritecollide(ship, aliens, False):
+        ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+    check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
 
 # ----------------- Обновление экрана!!! ----------------------------
 
@@ -102,7 +138,7 @@ def draw_stars(screen, stars):
         star_rect.center = stars[i]
         screen.blit(star, star_rect)
 
-def update_screen(ai_settings, screen, ship, aliens, bullets, stars):
+def update_screen(ai_settings, stats, screen, ship, aliens, bullets, stars):
     """Обновляет изображение на экране и отображает новый экран."""
     # Перерисовывается экран.
     screen.fill(ai_settings.bg_color)
@@ -111,7 +147,7 @@ def update_screen(ai_settings, screen, ship, aliens, bullets, stars):
     # Обновление снарядов
     update_bullets(ai_settings, screen, ship, aliens, bullets)
     # Обновление флота пришельцев
-    update_aliens(ai_settings, aliens)
+    update_aliens(ai_settings, stats, screen, ship, aliens, bullets)
     # Перерисовка корабля
     ship.update()
     ship.blitme()
