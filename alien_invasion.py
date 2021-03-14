@@ -4,6 +4,7 @@ from settings import Settings
 from game_stats import GameStats
 from ship import Ship
 import game_functions as gf
+from button import Button
 
 def run_game():
     # Инициализирует игру и создает объект экрана.
@@ -14,6 +15,8 @@ def run_game():
         (ai_settings.screen_whidth, ai_settings.screen_height))
     pygame.display.set_caption("Alien Invasion")
     stars = gf.get_stars(ai_settings)
+    # Создание кнопки Play
+    play_button = Button(ai_settings, screen, "Play")
     # Создание корабля.
     ship = Ship(ai_settings, screen)
     # Создание группы для хранения снарядов
@@ -28,7 +31,7 @@ def run_game():
         # Отслеживание событий клавиатуры и мыши.
         gf.check_events(ai_settings, screen, ship, bullets)
         
-        if stats.game_active:
-            gf.update_screen(ai_settings, stats, screen, ship, aliens, bullets, stars)
+
+        gf.update_screen(ai_settings, stats, screen, ship, aliens, bullets, stars, play_button)
 
 run_game()

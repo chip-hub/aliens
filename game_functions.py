@@ -138,7 +138,7 @@ def draw_stars(screen, stars):
         star_rect.center = stars[i]
         screen.blit(star, star_rect)
 
-def update_screen(ai_settings, stats, screen, ship, aliens, bullets, stars):
+def update_screen(ai_settings, stats, screen, ship, aliens, bullets, stars, play_button):
     """Обновляет изображение на экране и отображает новый экран."""
     # Перерисовывается экран.
     screen.fill(ai_settings.bg_color)
@@ -153,6 +153,10 @@ def update_screen(ai_settings, stats, screen, ship, aliens, bullets, stars):
     ship.blitme()
     # Перерисовка пришельца
     aliens.draw(screen)
+    
+    # Кнопка Play отображается в том случае, если игра неактивна.
+    if not stats.game_active:
+        play_button.draw_button()
     
     # Отображение последнего прорисованного экрана.
     pygame.display.flip()

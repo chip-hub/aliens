@@ -18,6 +18,6 @@ class Settings():
         self.bullets_allowed = 3
         self.alien_speed_factor = 1
         # величина снижения флота
-        self.fleet_drop_speed = 50
+        self.fleet_drop_speed = 10
         # флаг направления движения флота
         self.fleet_direction = 1
