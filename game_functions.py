@@ -31,7 +31,20 @@ def check_keyup_events(event, ship):
         # Отменить переместить корабль влево.
         ship.moving_left = False
 
-def check_events(ai_settings, screen, ship, bullets):
+def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
+    """Запускает новую игру при нажатии кнопки Play."""
+    if play_button.rect.collidepoint(mouse_x, mouse_y):
+        # Сброс игровой статистики.
+        stats.reset_stats()
+        stats.game_active = True
+        # Очистка списков пришельцев и снарядов.
+        aliens.empty()
+        bullets.empty()
+        # Создание нового флота и размещение корабля.
+        creat_fleet(ai_settings, screen, ship, aliens)
+        ship.center_ship()
+
+def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets):
     """Обрабатывает нажатия клавиш и события мыши."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -40,6 +53,9 @@ def check_events(ai_settings, screen, ship, bullets):
             check_keydown_events(event, ai_settings, screen, ship, bullets)
         elif event.type == pygame.KEYUP:
             check_keyup_events(event, ship)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
 
 # ----------------- Снаряды!!! -----------------------------
 
@@ -144,10 +160,8 @@ def update_screen(ai_settings, stats, screen, ship, aliens, bullets, stars, play
     screen.fill(ai_settings.bg_color)
 
     draw_stars(screen, stars)
-    # Обновление снарядов
-    update_bullets(ai_settings, screen, ship, aliens, bullets)
-    # Обновление флота пришельцев
-    update_aliens(ai_settings, stats, screen, ship, aliens, bullets)
+    
+
     # Перерисовка корабля
     ship.update()
     ship.blitme()
@@ -157,7 +171,12 @@ def update_screen(ai_settings, stats, screen, ship, aliens, bullets, stars, play
     # Кнопка Play отображается в том случае, если игра неактивна.
     if not stats.game_active:
         play_button.draw_button()
-    
+    else:
+        # Обновление снарядов
+        update_bullets(ai_settings, screen, ship, aliens, bullets)
+        # Обновление флота пришельцев
+        update_aliens(ai_settings, stats, screen, ship, aliens, bullets)
+
     # Отображение последнего прорисованного экрана.
     pygame.display.flip()
 
