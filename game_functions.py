@@ -80,6 +80,7 @@ def check_bullet_allien_collision(ai_settings, screen, ship, aliens, bullets):
     if len(aliens) == 0:
         # Уничтожение снарядов и создание нового флота
         bullets.empty()
+        ai_settings.increase_speed()
         creat_fleet(ai_settings, screen, ship, aliens)
 
 def update_bullets(ai_settings, screen, ship, aliens, bullets):
