@@ -6,14 +6,18 @@ class Button():
         self.screen = screen
         self.screen_rect = screen.get_rect()
         # Назначение размеров и свойств кнопок.
+        self.bd_width, self.bd_height = 208, 56
+        self.bd_color = (0, 0, 0)
         self.width, self.height = 200, 50
         self.button_color = (200, 200, 100)
         self.text_color = (255, 255, 255)
         self.font = pygame.font.SysFont(None, 48)
 
         # Построение объекта rect кнопки и выравнивание по центру экрана
+        self.bd_rect = pygame.Rect(0, 0, self.bd_width, self.bd_height)
+        self.bd_rect.center = self.screen_rect.center
         self.rect = pygame.Rect(0, 0, self.width, self.height)
-        self.rect.center = self.screen_rect.center
+        self.rect.center = self.bd_rect.center
         # Сообщение кнопки
         self.prep_msg(msg)
 
@@ -25,5 +29,6 @@ class Button():
 
     def draw_button(self):
         # Отображение пустой кнопки и вывод сообщения.
+        self.screen.fill(self.bd_color, self.bd_rect)
         self.screen.fill(self.button_color, self.rect)
         self.screen.blit(self.msg_image, self.msg_image_rect)
